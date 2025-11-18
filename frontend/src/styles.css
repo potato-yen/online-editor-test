@@ -71,63 +71,149 @@
 }
 
 /* ========================================================= */
-/* Print Styles (PDF Export Fixes) - 修正版 */
+/* Print Styles (PDF Export Fixes) - 最終完美版 */
 /* ========================================================= */
 @media print {
   .non-printable {
     display: none !important;
   }
 
-  /* 1. 重設所有主要容器，確保內容可見 */
+  /* 1. 佈局重置：確保所有容器可見且為流式佈局 */
   body, html, #root, 
   div[class*="flex-col"], 
   div[class*="flex-row"], 
-  div[class*="flex-1"] {
+  div[class*="flex-1"],
+  div[style*="width:"] {
     height: auto !important;
     width: 100% !important;
     overflow: visible !important;
     display: block !important;
     position: static !important;
     background: #ffffff !important;
+    color: #000000 !important;
   }
 
-  /* 2. (FIX) 消除左側黑線：將所有 Tailwind border 設為透明 */
+  /* 2. 消除雜訊：將所有 Tailwind 邊框強制透明 (除了表格和代碼) */
   div[class*="border-"], section[class*="border-"] {
     border-color: transparent !important;
     box-shadow: none !important;
   }
 
-  /* 3. (FIX) 設定內文純黑 (標題、段落、列表)，但「排除」代碼區塊 */
-  /* 這樣可以讓一般文字變黑，但程式碼保留原本的分詞顏色 */
-  .prose :where(h1, h2, h3, h4, h5, h6, p, li, strong, em, blockquote, table, th, td) {
+  /* 3. 強制內文黑字：重寫 Prose 變數，這是最徹底的方法 */
+  .prose {
+    --tw-prose-body: #000000 !important;
+    --tw-prose-headings: #000000 !important;
+    --tw-prose-lead: #000000 !important;
+    --tw-prose-links: #000000 !important;
+    --tw-prose-bold: #000000 !important;
+    --tw-prose-counters: #000000 !important;
+    --tw-prose-bullets: #000000 !important;
+    --tw-prose-hr: #000000 !important;
+    --tw-prose-quotes: #000000 !important;
+    --tw-prose-quote-borders: #000000 !important;
+    --tw-prose-captions: #000000 !important;
+    color: #000000 !important; /* 雙重保險 */
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-color: #ffffff !important;
+  }
+
+  .prose.prose-invert {
+    --tw-prose-body: #000000 !important;
+    --tw-prose-headings: #000000 !important;
+    --tw-prose-lead: #000000 !important;
+    --tw-prose-links: #000000 !important;
+    --tw-prose-bold: #000000 !important;
+    --tw-prose-counters: #000000 !important;
+    --tw-prose-bullets: #000000 !important;
+    --tw-prose-hr: #000000 !important;
+    --tw-prose-quotes: #000000 !important;
+    --tw-prose-quote-borders: #000000 !important;
+    --tw-prose-captions: #000000 !important;
     color: #000000 !important;
   }
   
-  .prose a {
+  /* 4. 針對具體元素強制黑字 (排除 code) */
+  .prose :where(h1, h2, h3, h4, h5, h6, p, li, strong, em, blockquote, table, th, td) {
     color: #000000 !important;
-    text-decoration: underline;
+    text-shadow: none !important;
+  }
+  .prose.prose-invert :where(h1, h2, h3, h4, h5, h6, p, li, strong, em, blockquote, table, th, td) {
+    color: #000000 !important;
+    text-shadow: none !important;
   }
 
-  /* 4. (FIX) 程式碼區塊設定：保留高亮顏色 */
+  .katex {
+    color: #000000 !important;
+  }
+
+  /* 4.1 隱藏瀏覽器列印時自動補上的 URL 尾註 */
+  a[href]:after {
+    content: none !important;
+  }
+
+  /* 5. 程式碼區塊 (PRE/CODE) 設定 */
+  /* 策略：背景淺灰，基底文字深灰，但【不覆寫 span 顏色】以保留 Tokenizer 效果 */
   .prose pre {
-    background-color: #f5f5f5 !important; /* 淺灰底 */
-    border: 1px solid #ddd !important;     /* 保留框線 */
-    color: inherit;                        /* 不強制變黑，繼承 highlight.js 顏色 */
+    background-color: #f5f5f5 !important; /* 淺灰底，區隔代碼塊 */
+    border: 1px solid #ddd !important;     /* 加上細邊框 */
+    color: #000000 !important;             /* 基底文字設為深色 (非純黑) */
     break-inside: avoid;                   /* 避免被分頁切斷 */
+    text-shadow: none !important;
     
     /* 強制瀏覽器列印背景色 */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* 5. (FIX) 恢復您原本的分頁設定 */
+  /* 讓 hljs 容器背景透明，避免蓋掉 pre 的背景 */
+  .prose pre code, .prose pre .hljs {
+    background: transparent !important;
+    color: inherit; /* 繼承 pre 的基底顏色，除非被 span 覆蓋 */
+  }
+
+  /* 6. 表格樣式 */
+  .prose table {
+    border-collapse: collapse !important;
+  }
+  .prose th, .prose td {
+    border: 1px solid #000 !important; /* 列印時表格線條加深 */
+    color: #000 !important;
+  }
+
+  /* 6.1 KBD 與 MARK 元素在列印時的樣式 */
+  .prose kbd {
+    background-color: #eeeeee !important;
+    color: #000000 !important;
+    padding: 0.1rem 0.4rem;
+    border-radius: 6px;
+    border: 0 solid #cccccc !important;
+    box-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 1.5em;
+    font-weight: 500;
+    font-family: inherit;
+    white-space: nowrap;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .prose mark {
+    background-color: #fffb8f !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 7. 分頁設定：移除瀏覽器預設 header/footer */
   @page {
     size: A4;
-    margin: 20mm; /* 使用標準邊距，確保分頁邏輯正常 */
-  }
-  
-  body {
-    padding: 0 !important;
+    margin: 20mm;
+    @top-center { content: ''; }
+    @bottom-center { content: ''; }
   }
 }
 
