@@ -68,7 +68,7 @@ export function useEditorModals({
           matrixBody += matrixData[r][c] || `a_{${r + 1}${c + 1}}`
         }
         if (r < rows - 1) {
-          matrixBody += ' \\ '
+          matrixBody += ' \\\\ '
         }
       }
       const templateStart = '$$\\begin{bmatrix}'
