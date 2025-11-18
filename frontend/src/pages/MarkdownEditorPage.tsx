@@ -84,6 +84,7 @@ export default function MarkdownEditorPage() {
       setSaveStatus('error')
     } else {
       setSaveStatus('saved')
+      setPendingText(null)
       setDoc((prev) =>
         prev ? { ...prev, content: text, updated_at: now } : prev,
       )

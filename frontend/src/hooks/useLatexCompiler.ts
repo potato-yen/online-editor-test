@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { Mode } from '../types'
 
@@ -32,6 +32,15 @@ export function useLatexCompiler({ text, mode }: UseLatexCompilerOptions) {
   const [pdfURL, setPdfURL] = useState('')
   const [compileErrorLog, setCompileErrorLog] = useState('')
   const [compileErrorLines, setCompileErrorLines] = useState<number[]>([])
+
+  useEffect(() => {
+    if (!pdfURL || !pdfURL.startsWith('blob:')) return undefined
+
+    // Revoke the previous object URL when pdfURL changes or on unmount
+    return () => {
+      URL.revokeObjectURL(pdfURL)
+    }
+  }, [pdfURL])
 
   const handleCompileLatex = useCallback(async () => {
     if (mode !== 'latex') return
