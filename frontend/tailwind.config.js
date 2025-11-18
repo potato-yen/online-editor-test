@@ -4,70 +4,87 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
-  // 啟用 class 模式的 dark mode，方便未來切換
   darkMode: 'class', 
   theme: {
     extend: {
       fontFamily: {
-        // 設定預設字體堆疊
         sans: ['Inter', 'Noto Sans TC', ...defaultTheme.fontFamily.sans],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
       },
+      // --- 新增動畫設定 ---
+      animation: {
+        blob: "blob 24s ease-in-out infinite",
+        "blob-slow": "blob-slow 32s ease-in-out infinite",
+        "blob-reverse": "blob-reverse 28s ease-in-out infinite", // 新增反向動畫
+      },
+      keyframes: {
+        // 原本的動畫 (往右上方跑) - 適合放在左邊的球
+        blob: {
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "20%": { transform: "translate3d(20vw, -18vh, 0) scale(1.12)" },
+          "45%": { transform: "translate3d(35vw, 8vh, 0) scale(0.92)" },
+          "70%": { transform: "translate3d(-18vw, 12vh, 0) scale(1.05)" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+        },
+        // 慢速柔和動畫，讓色塊更自然
+        "blob-slow": {
+          "0%": { transform: "translate3d(-5vw, 6vh, 0) scale(0.95)" },
+          "25%": { transform: "translate3d(18vw, 28vh, 0) scale(1.08)" },
+          "55%": { transform: "translate3d(-22vw, 35vh, 0) scale(1.15)" },
+          "80%": { transform: "translate3d(-10vw, -25vh, 0) scale(0.9)" },
+          "100%": { transform: "translate3d(-5vw, 6vh, 0) scale(0.95)" },
+        },
+        // 新增：反向動畫 (往左上方跑) - 適合放在右邊的球 (第四象限)
+        "blob-reverse": {
+          "0%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "25%": { transform: "translate3d(-25vw, -20vh, 0) scale(1.08)" },
+          "55%": { transform: "translate3d(-35vw, 15vh, 0) scale(0.94)" },
+          "80%": { transform: "translate3d(22vw, -10vh, 0) scale(1.06)" },
+          "100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+        },
+      },
+      // ------------------
       colors: {
-        // --- 語意化顏色系統 (Semantic Colors) ---
-        
-        // 1. 品牌色 (Brand) - 目前沿用 Sky 藍色系
         brand: {
-          DEFAULT: '#0ea5e9', // sky-500
-          hover: '#38bdf8',   // sky-400
-          active: '#0284c7',  // sky-600
-          muted: 'rgba(14, 165, 233, 0.1)', // sky-500/10
+          DEFAULT: '#0ea5e9', 
+          hover: '#38bdf8',   
+          active: '#0284c7',  
+          muted: 'rgba(14, 165, 233, 0.1)', 
         },
-
-        // 2. 背景層級 (Surface) - 基於 Neutral 色系
         surface: {
-          base: '#0a0a0a',    // neutral-950: 應用程式最底層背景
-          layer: '#171717',   // neutral-900: 側邊欄、卡片背景
-          panel: '#262626',   // neutral-800: 浮動面板、Dropdown
-          elevated: '#404040',// neutral-700: Modal、高亮區塊
+          base: '#0a0a0a',    
+          layer: '#171717',   
+          panel: '#262626',   
+          elevated: '#404040',
         },
-
-        // 3. 內容文字 (Content)
         content: {
-          primary: '#f5f5f5',   // neutral-100: 主要標題、正文
-          secondary: '#a3a3a3', // neutral-400: 次要資訊、說明文字
-          muted: '#525252',     // neutral-600: 停用狀態、浮水印
-          inverse: '#0a0a0a',   // 反白文字
+          primary: '#f5f5f5',   
+          secondary: '#a3a3a3', 
+          muted: '#525252',     
+          inverse: '#0a0a0a',   
         },
-
-        // 4. 邊框與分隔線 (Border)
         border: {
-          base: '#262626',      // neutral-800: 一般邊框
-          subtle: '#171717',    // neutral-900: 輕微去背
-          highlight: '#404040', // neutral-700: Hover 時的邊框
+          base: '#262626',      
+          subtle: '#171717',    
+          highlight: '#404040', 
         },
-
-        // 5. 狀態色 (Status)
         status: {
-          error: '#ef4444',   // red-500
-          success: '#22c55e', // green-500
-          warning: '#eab308', // yellow-500
-          info: '#3b82f6',    // blue-500
+          error: '#ef4444',   
+          success: '#22c55e', 
+          warning: '#eab308', 
+          info: '#3b82f6',    
         }
       },
-      // 擴充 Typography (Prose) 插件的預設樣式
       typography: (theme) => ({
         DEFAULT: {
           css: {
             color: theme('colors.content.primary'),
-            // 讓 prose 內部的連結預設使用品牌色
             a: {
               color: theme('colors.brand.DEFAULT'),
               '&:hover': {
                 color: theme('colors.brand.hover'),
               },
             },
-            // 讓 inline code 背景色與我們設計系統一致
             'code::before': { content: '""' },
             'code::after': { content: '""' },
             code: {
