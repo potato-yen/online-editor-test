@@ -58,6 +58,7 @@ type AddFilePromptState = {
 type EditorCoreProps = {
   initialMode: Mode
   initialText?: string
+  title?: string
   saveStatus?: SaveStatus
   onContentChange?: (text: string) => void
   onManualSave?: () => void
@@ -67,6 +68,7 @@ type EditorCoreProps = {
 export function EditorCore({
   initialMode,
   initialText,
+  title,
   saveStatus = 'idle',
   onContentChange,
   onManualSave,
@@ -153,11 +155,12 @@ export function EditorCore({
   // ---------- 匯出原始檔 (組員的原始碼) ----------
   const handleExportSource = () => {
     const ext = mode === 'latex' ? 'tex' : 'md'
+    const filename = `${title?.trim() || 'document'}.${ext}`
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `document.${ext}`
+    a.download = filename
     a.click()
     URL.revokeObjectURL(url)
   }

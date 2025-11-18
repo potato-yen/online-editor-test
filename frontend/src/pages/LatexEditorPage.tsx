@@ -132,6 +132,7 @@ export default function LatexEditorPage() {
     <EditorCore
       initialMode="latex"
       initialText={doc.content}
+      title={doc.title}
       saveStatus={saveStatus}
       onContentChange={handleContentChange}
       onManualSave={handleManualSave}

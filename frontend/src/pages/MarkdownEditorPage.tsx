@@ -137,6 +137,7 @@ export default function MarkdownEditorPage() {
     <EditorCore
       initialMode="markdown"
       initialText={doc.content}
+      title={doc.title}
       saveStatus={saveStatus}
       onContentChange={handleContentChange}
       onManualSave={handleManualSave}
