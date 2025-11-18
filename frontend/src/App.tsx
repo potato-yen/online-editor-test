@@ -101,6 +101,7 @@ export function EditorCore({
   const [renderedHTML, setRenderedHTML] = useState<string>('')
   const [pdfURL, setPdfURL] = useState<string>('')
   const [compileErrorLog, setCompileErrorLog] = useState<string>('')
+  const [compileErrorLines, setCompileErrorLines] = useState<number[]>([])
   const [isCompiling, setIsCompiling] = useState(false)
 
   const [splitPos, setSplitPos] = useState(50)
@@ -696,6 +697,7 @@ export function EditorCore({
     if (mode !== 'latex') return
     setIsCompiling(true)
     setCompileErrorLog('')
+    setCompileErrorLines([])
     setPdfURL('')
     try {
       const res = await fetch(BACKEND_URL, {
@@ -708,6 +710,12 @@ export function EditorCore({
         throw new Error('Invalid response from compile server')
       }
       if (!data.success) {
+        const errorLines = Array.isArray(data.errorLines)
+          ? data.errorLines
+              .map((n: unknown) => Number(n))
+              .filter((n) => Number.isFinite(n))
+          : []
+        setCompileErrorLines(errorLines)
         setCompileErrorLog(data.errorLog || data.error || 'LaTeX 編譯失敗')
         return
       }
@@ -723,9 +731,11 @@ export function EditorCore({
       const blob = new Blob([byteArray], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
       setPdfURL(url)
+      setCompileErrorLines([])
     } catch (err: any) {
       console.error(err)
       setCompileErrorLog(err?.message || 'LaTeX 編譯失敗')
+      setCompileErrorLines([])
     } finally {
       setIsCompiling(false)
     }
