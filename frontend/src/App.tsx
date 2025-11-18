@@ -925,6 +925,15 @@ export default function App() {
   const [promptState, setPromptState] = useState<AddFilePromptState | null>(null)
   const [promptValue, setPromptValue] = useState('')
   const resolverRef = useRef<((value: string | null) => void) | null>(null)
+  const promptInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (!promptState) return
+    const raf = requestAnimationFrame(() => {
+      promptInputRef.current?.select()
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [promptState])
 
   const closePrompt = (result: string | null) => {
     const resolver = resolverRef.current
@@ -1000,6 +1009,7 @@ export default function App() {
             </label>
             <input
               autoFocus
+              ref={promptInputRef}
               value={promptValue}
               onChange={(e) => setPromptValue(e.target.value)}
               onKeyDown={handleKeyDown}
