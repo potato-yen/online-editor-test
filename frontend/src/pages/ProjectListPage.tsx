@@ -189,7 +189,7 @@ export default function ProjectListPage({ openAddFilePrompt }: ProjectListPagePr
               Import
             </Button>
             
-            <div className="relative group">
+            <div className={`relative ${canCreateMore ? 'group' : ''}`}>
               <Button 
                 disabled={!canCreateMore || creating}
                 className="pl-3 pr-4 gap-1"
@@ -197,10 +197,12 @@ export default function ProjectListPage({ openAddFilePrompt }: ProjectListPagePr
                 <IconPlus /> Create New
               </Button>
               {/* Simple CSS Hover Dropdown for Create */}
-              <div className="absolute right-0 mt-1 w-40 py-1 bg-surface-panel border border-border-base rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-20">
-                <button onClick={() => handleAddDoc('markdown')} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-elevated text-content-primary">Markdown</button>
-                <button onClick={() => handleAddDoc('latex')} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-elevated text-content-primary">LaTeX</button>
-              </div>
+              {canCreateMore && (
+                <div className="absolute right-0 mt-1 w-40 py-1 bg-surface-panel border border-border-base rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-20">
+                  <button onClick={() => handleAddDoc('markdown')} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-elevated text-content-primary">Markdown</button>
+                  <button onClick={() => handleAddDoc('latex')} className="w-full text-left px-4 py-2 text-sm hover:bg-surface-elevated text-content-primary">LaTeX</button>
+                </div>
+              )}
             </div>
           </div>
         </div>
