@@ -15,6 +15,7 @@ type Props = {
   onManualSave?: () => void
   onSetMode?: (m: Mode) => void
   toolbarUI?: ReactNode
+  settingsMenu?: ReactNode
 }
 
 export default function AppHeader({
@@ -26,6 +27,7 @@ export default function AppHeader({
   onExportPDF,
   onManualSave,
   toolbarUI,
+  settingsMenu,
 }: Props) {
   const navigate = useNavigate()
 
@@ -100,6 +102,8 @@ export default function AppHeader({
               Export PDF
             </Button>
           )}
+
+          {settingsMenu && <div className="ml-1">{settingsMenu}</div>}
         </div>
       </div>
 

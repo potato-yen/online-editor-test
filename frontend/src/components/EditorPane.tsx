@@ -9,6 +9,8 @@ interface EditorPaneProps {
   editorRef: React.RefObject<HTMLTextAreaElement>
   onScroll: (e: React.UIEvent<HTMLTextAreaElement>) => void
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  fontSize: number
+  wordWrap: boolean
 }
 
 export default function EditorPane({
@@ -17,6 +19,8 @@ export default function EditorPane({
   editorRef,
   onScroll,
   onKeyDown,
+  fontSize,
+  wordWrap,
 }: EditorPaneProps) {
   return (
     <div className="h-full w-full flex flex-col bg-surface-base relative group">
@@ -31,9 +35,15 @@ export default function EditorPane({
         ref={editorRef}
         onScroll={onScroll}
         onKeyDown={onKeyDown}
-        className="w-full h-full resize-none bg-transparent text-content-primary text-sm font-mono leading-relaxed p-6 outline-none scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-elevated/50 hover:scrollbar-thumb-surface-elevated"
+        className="w-full h-full resize-none bg-transparent text-content-primary font-mono leading-relaxed p-6 outline-none scrollbar-thin scrollbar-track-transparent scrollbar-thumb-surface-elevated/50 hover:scrollbar-thumb-surface-elevated"
+        style={{
+          fontSize: `${fontSize}px`,
+          lineHeight: 1.6,
+          whiteSpace: wordWrap ? undefined : 'pre',
+        }}
         value={text}
         onChange={(e) => onTextChange(e.target.value)}
+        wrap={wordWrap ? 'soft' : 'off'}
         spellCheck={false}
         placeholder="Start typing here..."
       />

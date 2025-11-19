@@ -7,6 +7,7 @@ import 'highlight.js/styles/atom-one-dark.css';
 import AppHeader from './components/AppHeader'
 import EditorPane from './components/EditorPane'
 import PreviewPane from './components/PreviewPane'
+import SettingsMenu from './components/SettingsMenu'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom' 
 import ProjectListPage from './pages/ProjectListPage'
 import MarkdownEditorPage from './pages/MarkdownEditorPage'
@@ -30,6 +31,11 @@ import { useLatexCompiler } from './hooks/useLatexCompiler'
 import { useMarkdownRenderer } from './hooks/useMarkdownRenderer'
 import { useSplitPane } from './hooks/useSplitPane'
 import { useScrollSync } from './hooks/useScrollSync'
+import {
+  EditorSettingsProvider,
+  useEditorSettings,
+} from './contexts/EditorSettingsContext'
+import { useAccountActions } from './hooks/useAccountActions'
 
 // Global Mermaid
 declare global {
@@ -63,6 +69,7 @@ export function EditorCore({
   const [mode] = useState<Mode>(initialMode)
   const defaultText = ''
   const [text, setText] = useState<string>(() => initialText ?? defaultText)
+  const { fontSize, wordWrap, indentSize } = useEditorSettings()
 
   const previewRef = useRef<HTMLDivElement | null>(null)
   const editorRef = useRef<HTMLTextAreaElement | null>(null)
@@ -75,7 +82,7 @@ export function EditorCore({
     handleSmartInline,
     handleSimpleInsert,
     handleTabKey,
-  } = useEditorActions({ editorRef, onContentChange, setText })
+  } = useEditorActions({ editorRef, onContentChange, setText, indentSize })
 
   const {
     isTableModalOpen, isSuperscriptModalOpen, isSubscriptModalOpen, isMatrixModalOpen,
@@ -84,10 +91,21 @@ export function EditorCore({
     onCreateTable, onCreateSuperscript, onCreateSubscript, onCreateMatrix,
   } = useEditorModals({ editorRef, handleSimpleInsert })
 
-  const { handleEditorScroll, editorLineHeight } = useScrollSync({ editorRef, previewRef, mode })
+  const { handleEditorScroll, editorLineHeight } = useScrollSync({
+    editorRef,
+    previewRef,
+    mode,
+    fontSize,
+  })
   const { isCompiling, pdfURL, compileErrorLog, handleCompileLatex } = useLatexCompiler({ text, mode })
 
   const isAtBottomRef = useRef(false)
+
+  const {
+    onModifyUsername,
+    onChangePassword,
+    onDeleteAccount,
+  } = useAccountActions()
 
   // Auto scroll logic
   useEffect(() => {
@@ -150,6 +168,14 @@ export function EditorCore({
     />
   );
 
+  const settingsMenu = (
+    <SettingsMenu
+      onModifyUsername={onModifyUsername}
+      onChangePassword={onChangePassword}
+      onDeleteAccount={onDeleteAccount}
+    />
+  )
+
   return (
     <div className="flex h-screen flex-col bg-surface-base text-content-primary overflow-hidden">
       {/* Modals (always rendered, hidden by state) */}
@@ -170,7 +196,8 @@ export function EditorCore({
           onExportSource={handleExportSource}
           onExportPDF={handleExportPDF}
           onManualSave={onManualSave}
-          toolbarUI={ToolbarComponent} 
+          toolbarUI={ToolbarComponent}
+          settingsMenu={settingsMenu}
         />
       </div>
 
@@ -186,6 +213,8 @@ export function EditorCore({
             editorRef={editorRef}
             onScroll={handleEditorScroll}
             onKeyDown={handleTabKey}
+            fontSize={fontSize}
+            wordWrap={wordWrap}
           />
         </section>
 
@@ -267,7 +296,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <EditorSettingsProvider>
       <BrowserRouter>
         <AppRouterWrapper openAddFilePrompt={openAddFilePrompt} />
       </BrowserRouter>
@@ -300,6 +329,6 @@ export default function App() {
           </div>
         </div>
       )}
-    </>
+    </EditorSettingsProvider>
   );
 }
